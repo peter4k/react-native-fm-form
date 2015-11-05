@@ -5,7 +5,7 @@
 'use strict';
 
 var React = require('react-native');
-var FMForm = require('./FMForm');
+var FMForm = require('react-native-fm-form');
 var {
     AppRegistry,
     StyleSheet,

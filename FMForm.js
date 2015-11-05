@@ -1,10 +1,9 @@
 'use strict';
 
 var React = require('react-native');
-var DeepState = require('../utils/deepState');
-var AutoScroll = require('../utils/AutoScroll');
 var UIImagePickerManager = require('NativeModules').UIImagePickerManager;
 var { Icon, } = require('react-native-icons');
+var IOSBottomPicker = require('react-native-fm-picker');
 
 var {
     StyleSheet,
@@ -21,8 +20,6 @@ var {
 var SCREEN_WIDTH = require('Dimensions').get('window').width;
 var SCREEN_HEIGHT = require('Dimensions').get('window').height;
 
-var IOSBottomPicker = require('../editors/IOSBottomPicker');
-var ImageLoadingIndicator = require('../editors/imageLoadingIndicator');
 
 var Component = React.createClass({
     //Set a single field of the data
@@ -142,7 +139,7 @@ var Component = React.createClass({
                 }
                 return(
                     <TouchableOpacity style={styles.row}
-                        onPress={()=>{onClick(rowData.reference)}}
+                                      onPress={()=>{onClick(rowData.reference)}}
                         >
                         <View style={styles.rowContent}>
                             {firstSeparator}
@@ -228,22 +225,19 @@ var Component = React.createClass({
         var image;
         if (this.props.delegate.FMFormData[rowData.reference]) {
             var source = (typeof fieldValue == 'object') ? {uri: fieldValue.url} : {uri: 'data:image/jpeg;base64,' + fieldValue};
-            image = <ImageLoadingIndicator style={[styles.imageWithBorder, {marginTop: 0}]}
+            image = <ImageLoadingIndicator style={[styles.imageWithBorder, {marginTop: 0, marginLeft: 15}]}
                                            source={source}/>
-        } else {
-            image = <Image style={[styles.icon, {marginTop: 0, tintColor: '#ff9900', height: 35, width: 35}]}
-                           source={require('image!empty_photo')}/>
         }
 
         //setUpLabel
         var label;
         if (this.props.delegate.FMFormData[rowData.reference]) {
-            label = <Text style={{marginLeft: 15, color: '#ff9900'}}>
-                {rowData.labelWithPicture || '重新选择图片'}
+            label = <Text style={{color: Component.color}}>
+                {rowData.labelWithPicture || 'Choose another image'}
             </Text>
         } else {
-            label = <Text style={{marginLeft: 15, color: '#ff9900'}}>
-                {rowData.labelWithNoPicture || '选择图片'}
+            label = <Text style={{color: Component.color}}>
+                {rowData.labelWithNoPicture || 'Choose image'}
             </Text>
         }
 
@@ -254,9 +248,9 @@ var Component = React.createClass({
                     var self = this;
                     var options = {
                         title: null,
-                        cancelButtonTitle: '取消',
-                        takePhotoButtonTitle: '拍一张照片',
-                        chooseFromLibraryButtonTitle: '从相册中选择一张照片',
+                        cancelButtonTitle: 'Cancel',
+                        takePhotoButtonTitle: 'Take a photo',
+                        chooseFromLibraryButtonTitle: 'Choose from camera roll',
                         quality: 1,
                         allowsEditing: true,
                         storageOptions: {
@@ -289,7 +283,7 @@ var Component = React.createClass({
         return (
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
                 <Image
-                    style={[styles.icon, {width: size, height: size, marginTop: 0, marginRight: marginRight, marginLeft:marginLeft, tintColor: rowData.iconColor || '#ff9900'}]}
+                    style={[styles.icon, {width: size, height: size, marginTop: 0, marginRight: marginRight, marginLeft:marginLeft, tintColor: rowData.iconColor || Component.color}]}
                     source={rowData.image}
                     />
                 {(() => {
@@ -314,7 +308,7 @@ var Component = React.createClass({
                     style={[styles.icon, {width: size, height: size, marginTop: 0, marginRight: marginRight, marginLeft:marginLeft}]}
                     name={rowData.icon}
                     size={size}
-                    color={rowData.iconColor || '#ff9900'}
+                    color={rowData.iconColor || Component.color}
                     />
                 {(() => {
                     return this._renderRowContent(rowData, sectionID, rowID, fieldValue);
@@ -418,10 +412,10 @@ var Component = React.createClass({
         var buttonLabel;
         if (fieldValue == true) {
             if (rowData.onLabel) buttonLabel = rowData.onLabel;
-            else buttonLabel = '是';
+            else buttonLabel = 'On';
         } else {
             if (rowData.offLabel) buttonLabel = rowData.offLabel;
-            else buttonLabel = '否';
+            else buttonLabel = 'Off';
         }
         return (
             <View>
@@ -440,7 +434,7 @@ var Component = React.createClass({
                                 this.formShouldReload();
                                 if(rowData.onValueChange) rowData.onValueChange();
                             }}
-                        onTintColor={'#ff9900'}
+                        onTintColor={Component.color}
                         value={fieldValue}/>
                 </View>
             </View>
@@ -462,7 +456,8 @@ var Component = React.createClass({
         var pickerId = 'FMpicker' + sectionID + ':' + rowID;
         var options = (typeof rowData.options == 'function') ? rowData.options() : rowData.options;
         var labels = (typeof rowData.labels == 'function') ? rowData.labels() : rowData.labels;
-        var buttonLabel = labels[options.indexOf(this.props.delegate.FMFormData[rowData.reference])] || '点击选择';
+        var defaultButtonLabel = rowData.defaultButtonLabel || 'Click to choose';
+        var buttonLabel = labels[options.indexOf(this.props.delegate.FMFormData[rowData.reference])] || defaultButtonLabel;
         var self = this;
         return (
             <View style={{flex: 1}}>
@@ -483,7 +478,10 @@ var Component = React.createClass({
     }
 });
 
-var SCREEN_WIDTH = require('Dimensions').get('window').width;
+Component.color = '#007AFF';
+Component.setGlobalConfig = function(option){
+    if(option.color) Component.color = option.color;
+}
 
 var styles = StyleSheet.create({
     row: {
@@ -508,7 +506,7 @@ var styles = StyleSheet.create({
     inputLabel: {
         flex: 1,
         fontSize: 10,
-        color: '#ff9900',
+        color: Component.color,
         marginBottom: 5,
     },
     textInput: {
@@ -539,7 +537,7 @@ var styles = StyleSheet.create({
         fontSize: 13,
         borderRadius: 4,
         textAlign: 'center',
-        backgroundColor: '#ff9900',
+        backgroundColor: Component.color,
         color: 'white',
         padding: 8,
     },
@@ -549,7 +547,7 @@ var styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexDirection: 'row',
-        backgroundColor: '#ff9900',
+        backgroundColor: Component.color,
         padding: 8,
     },
     buttonLabel: {
@@ -558,7 +556,7 @@ var styles = StyleSheet.create({
     noImageButton: {
         padding: 20,
         borderWidth: 1,
-        borderColor: '#ff9900',
+        borderColor: Component.color,
     },
     icon: {
         flex: 0,

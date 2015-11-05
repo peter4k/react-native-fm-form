@@ -21,7 +21,7 @@
   "author": "Yi Wang",
   "license": "MIT",
   "dependencies": {
-    "react-native-fm-picker": "0.0.1",
+    "react-native-fm-picker": "^0.0.2",
     "react-native-icons": "^0.6.0",
     "react-native-image-picker" : "^0.9.0"
   }

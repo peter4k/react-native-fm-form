@@ -1,6 +1,8 @@
 # react-native-fm-form
 FM Form is a module for React Native to fast generate pages with a form. It works like Backbone forms. Using this module you can generate a page in 5 minutes!
 
+Currently only support iOS!!!
+
 I build this module because I am lazy... The original purpose of this project is for me to develop an app faster. I believe there are many bugs and design issue. If you are interesting in this project please help me improve it!
 
 generate a page like this in 5 mins:
